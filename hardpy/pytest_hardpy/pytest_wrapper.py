@@ -49,6 +49,7 @@ class PyTestWrapper(object):
                     "--hardpy-pt",
                 ],
                 cwd=self.config.tests_dir.absolute(),
+                stdin=subprocess.PIPE,
             )
         elif system() == "Windows":
             self._proc = subprocess.Popen(  # noqa: S603
@@ -78,10 +79,14 @@ class PyTestWrapper(object):
         Returns True if pytest was running and stopped.
         """
         if self.is_running() and self._proc:
-            if system() == "Linux":
-                self._proc.terminate()
-            elif system() == "Windows":
-                self._proc.send_signal(signal.CTRL_BREAK_EVENT)
+            a = "aaa"
+            self._proc.stdin.write(a.encode('utf-8'))
+            self._proc.stdin.close()
+            self._proc.wait()
+            # if system() == "Linux":
+            #     self._proc.terminate()
+            # elif system() == "Windows":
+            #     self._proc.send_signal(signal.CTRL_BREAK_EVENT)
             return True
         return False
 
